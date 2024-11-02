@@ -32,6 +32,7 @@ def save_config_with_sudo(config):
 
 def update_config(new_entries):
     config = load_config_with_sudo()
+    print('CONFIG =',config)
     if config is None:
         return
 
