@@ -41,7 +41,7 @@ def update_config(new_entries):
 
     for entry in new_entries:
         chain_name = entry['moniker']
-        address = entry['address']
+        address = entry['rbc']
 
         config["chains"][chain_name] = {
             "chain_id": "odyssey-0",
