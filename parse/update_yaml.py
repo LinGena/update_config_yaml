@@ -17,18 +17,18 @@ def load_config_with_sudo():
         return None
 
 def save_config_with_sudo(config):
-    config_yaml = yaml.safe_dump(config)
-    print(config_yaml)
-    # try:
-    #     subprocess.run(
-    #         ["sudo", "-u", "tenderduty", "tee", config_path],
-    #         input=config_yaml,
-    #         check=True,
-    #         text=True
-    #     )
-    #     print("Configuration successfully saved.")
-    # except subprocess.CalledProcessError as e:
-    #     print("Error saving the configuration file:", e)
+    config_yaml = yaml.safe_dump(config, default_flow_style=False, sort_keys=False)
+    try:
+        subprocess.run(
+            "sudo -u tenderduty bash -c 'cd && tee config.yml'",
+            input=config_yaml,
+            check=True,
+            text=True,
+            shell=True
+        )
+        print("Configuration successfully saved.")
+    except subprocess.CalledProcessError as e:
+        print("Error saving the configuration file:", e)
 
 def update_config(new_entries):
     config = load_config_with_sudo()
