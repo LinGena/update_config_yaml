@@ -32,7 +32,7 @@ def save_config_with_sudo(config):
 
 def update_config(new_entries):
     config = load_config_with_sudo()
-    print('CONFIG =',config)
+
     if config is None:
         return
 
@@ -54,4 +54,7 @@ def update_config(new_entries):
                 {"url": "https://story-testnet.rpc.kjnodes.com:443", "alert_if_down": False}
             ]
         }
+    print('----------------')
+    print(config)
+    print('----------------')
     save_config_with_sudo(config)
