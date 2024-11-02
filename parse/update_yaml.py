@@ -1,15 +1,14 @@
 import subprocess
 import yaml
 
-config_path = "/home/tenderduty/config.yml"
-
 def load_config_with_sudo():
     try:
         result = subprocess.run(
-            ["sudo", "-u", "tenderduty", "cat", config_path],
+            "sudo -u tenderduty bash -c 'cd && cat config.yml'",
             check=True,
             capture_output=True,
-            text=True
+            text=True,
+            shell=True
         )
         config = yaml.safe_load(result.stdout)
         return config
