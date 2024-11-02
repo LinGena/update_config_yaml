@@ -36,8 +36,7 @@ def update_config(new_entries):
     if config is None:
         return
 
-    if "chains" not in config:
-        config["chains"] = {}
+    config["chains"] = {}
 
     for entry in new_entries:
         chain_name = entry['moniker']
@@ -54,7 +53,4 @@ def update_config(new_entries):
                 {"url": "https://story-testnet.rpc.kjnodes.com:443", "alert_if_down": False}
             ]
         }
-    print('----------------')
-    print(config)
-    print('----------------')
     save_config_with_sudo(config)
