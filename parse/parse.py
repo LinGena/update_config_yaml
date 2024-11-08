@@ -1,15 +1,18 @@
 import requests
 from utils.db import Db
+import urllib.parse
 
 
 class Parse(Db):
     def __init__(self):
         super().__init__()
         self.address_links = [
-            'https://api-story-testnet.itrocket.net/cosmos/slashing/v1beta1/signing_infos'
+            'https://api-story-testnet.itrocket.net/cosmos/slashing/v1beta1/signing_infos',
+            'https://api-story-testnet.trusted-point.com/cosmos/slashing/v1beta1/signing_infos'
             ]
         self.moniker_links = [
-            'https://api-story-testnet.itrocket.net/cosmos/staking/v1beta1/validators'
+            'https://api-story-testnet.itrocket.net/cosmos/staking/v1beta1/validators',
+            'https://api-story-testnet.trusted-point.com/cosmos/staking/v1beta1/validators'
             ]
     
     def run(self) -> list:
@@ -40,6 +43,7 @@ class Parse(Db):
             if "description" in entry and "moniker" in entry["description"] and "operator_address" in entry
         ]
         for address in addresses:
+            
             moniker = self.get_moniker(address['address'], filtered_data)
             if moniker:
                 res = {
@@ -68,19 +72,43 @@ class Parse(Db):
 
     def get_rpcs(self) -> list:
         for link in self.address_links:
-            result = self.get_respose(link)
+            result = self.get_next(link)
             if result:
-                if 'info' in result and result['info']:
-                    return result['info']
+                return result
         raise Exception("Failed to retrieve address data from the specified links.")
+    
+
+    def get_next(self, url: str, result_nex: list = []) -> dict:
+        result = self.get_respose(url)
+        if result:
+            if 'info' in result and result['info']:
+                result_nex.extend(result['info']) 
+                if 'pagination' in result and result['pagination']:
+                    url = url.split('?')[0]
+                    encoded_next_key = encoded_next_key = urllib.parse.quote(result['pagination']['next_key'])
+                    link = url + f"?pagination.key={encoded_next_key}"
+                    return self.get_next(link, result_nex)                    
+        return result_nex
+
     
     def get_apis(self) -> list:
         for link in self.moniker_links:
-            result = self.get_respose(link)
+            result = self.get_next_moniker(link)
             if result:
-                if 'validators' in result and result['validators']:
-                    return result['validators']
+                return result
         raise Exception("Failed to retrieve validators data from the specified links.")
+    
+    def get_next_moniker(self, url: str, result_nex: list = []) -> dict:
+        result = self.get_respose(url)
+        if result:
+            if 'validators' in result and result['validators']:
+                result_nex.extend(result['validators']) 
+                if 'pagination' in result and result['pagination']:
+                    url = url.split('?')[0]
+                    encoded_next_key = encoded_next_key = urllib.parse.quote(result['pagination']['next_key'])
+                    link = url + f"?pagination.key={encoded_next_key}"
+                    return self.get_next_moniker(link, result_nex)                    
+        return result_nex
 
     def get_respose(self, link: str) -> dict:
         try:
