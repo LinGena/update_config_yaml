@@ -11,7 +11,7 @@ class Parse(Db):
             'https://api-story-testnet.trusted-point.com/cosmos/slashing/v1beta1/signing_infos'
             ]
         self.moniker_links = [
-            'https://api-story-testnet.itrocket.net/cosmos/staking/v1beta1/validators',
+            'https://api-story-testnet.itrocket.net/cosmos/staking/v1beta1/validators?status=BOND_STATUS_BONDED',
             'https://api-story-testnet.trusted-point.com/cosmos/staking/v1beta1/validators'
             ]
     
@@ -106,7 +106,7 @@ class Parse(Db):
                 if 'pagination' in result and result['pagination']:
                     url = url.split('?')[0]
                     encoded_next_key = encoded_next_key = urllib.parse.quote(result['pagination']['next_key'])
-                    link = url + f"?pagination.key={encoded_next_key}"
+                    link = url + f"?status=BOND_STATUS_BONDED&pagination.key={encoded_next_key}"
                     return self.get_next_moniker(link, result_nex)                    
         return result_nex
 
