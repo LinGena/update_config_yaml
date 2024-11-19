@@ -20,8 +20,8 @@ class Parse(Db):
             rpc_datas = self.get_rpcs()
             addresses = self.get_address(rpc_datas)
             moniker_datas = self.get_apis()
-            parse_result = self.get_result_list(addresses, moniker_datas)
-            result = self.get_db_result(parse_result)
+            result = self.get_result_list(addresses, moniker_datas)
+            # result = self.get_db_result(parse_result)
             self._logger.info(f'Received {len(result)} new address and moniker tokens.')
             return result
         except Exception as ex:
