@@ -12,7 +12,7 @@ class Parse(Db):
             ]
         self.moniker_links = [
             'https://api-story-testnet.itrocket.net/cosmos/staking/v1beta1/validators?status=BOND_STATUS_BONDED',
-            'https://api-story-testnet.trusted-point.com/cosmos/staking/v1beta1/validators'
+            'https://api-story-testnet.trusted-point.com/cosmos/staking/v1beta1/validators?status=BOND_STATUS_BONDED'
             ]
     
     def run(self) -> list:
