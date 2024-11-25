@@ -12,7 +12,8 @@ class Db():
         self.table_name = 'keys'
         self.table_structure = [
             {'name': 'rpc', 'spec': 'VARCHAR(255)', 'default': ''},
-            {'name': 'moniker', 'spec': 'VARCHAR(255)', 'default': ''}
+            {'name': 'moniker', 'spec': 'VARCHAR(255)', 'default': ''},
+            {'name': 'status', 'spec': 'INTEGER', '1': ''}
         ]
         self.create_db()
 
@@ -50,11 +51,15 @@ class Db():
             self.lock.release()
 
     def insert(self, values: dict):
+        values.update({'status':1})
         sql_field_str = ', '.join(values)
         sql_value_list = [f"'{val}'" for val in values.values()]
         sql_value_str = ', '.join(sql_value_list)
         sql_values = (self.table_name, sql_field_str, sql_value_str)
         self.commit('INSERT INTO %s (%s) VALUES (%s)' % sql_values)
+
+    def update_status_to_false(self, id: int):
+        self.commit(f'UPDATE {self.table_name} SET status=0 WHERE id={id}')
 
     def create_db(self):
         create_structure = ["id INTEGER PRIMARY KEY AUTOINCREMENT"]

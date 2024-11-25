@@ -14,26 +14,39 @@ class Parse(Db):
             'https://api-story-testnet.itrocket.net/cosmos/staking/v1beta1/validators?status=BOND_STATUS_BONDED',
             'https://api-story-testnet.trusted-point.com/cosmos/staking/v1beta1/validators?status=BOND_STATUS_BONDED'
             ]
+        self.status_added = False
     
     def run(self) -> list:
         try:
             rpc_datas = self.get_rpcs()
             addresses = self.get_address(rpc_datas)
             moniker_datas = self.get_apis()
-            result = self.get_result_list(addresses, moniker_datas)
-            # result = self.get_db_result(parse_result)
-            self._logger.info(f'Received {len(result)} new address and moniker tokens.')
-            return result
+            parse_result = self.get_result_list(addresses, moniker_datas)
+            self.insert_db_result(parse_result)
+            if self.get_db_result(parse_result):
+                return parse_result
+            if self.status_added:
+                return parse_result
         except Exception as ex:
             self._logger.error(ex)
+        return None
 
-    def get_db_result(self, parse_result: list) -> list:
-        result = []
+    def insert_db_result(self, parse_result: list) -> None:
         for data in parse_result:
             if not self.does_record_exist(f"rpc = '{data['rpc']}'"):
                 self.insert(data)
-                result.append(data)
-        return result
+                self.status_added = True
+                
+    def get_db_result(self, parse_result: list) -> bool:
+        status = False
+        current_db_data = self.select("status=1")
+        new_rpc_set = {data['rpc'] for data in parse_result}
+        for db_record in current_db_data:
+            if db_record['rpc'] not in new_rpc_set:
+                self.update_status_to_false(db_record['id'])
+                status = True
+        return status
+
 
     def get_result_list(self, addresses: list, moniker_datas: list) -> list:
         result = []

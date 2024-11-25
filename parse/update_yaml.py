@@ -1,5 +1,7 @@
 import subprocess
 import yaml
+import random
+
 
 def load_config_with_sudo():
     try:
@@ -38,19 +40,23 @@ def update_config(new_entries):
 
     config["chains"] = {}
 
+    nodes = [
+            {"url": "https://story-testnet-rpc.itrocket.net:443", "alert_if_down": False},
+            {"url": "https://odyssey.storyrpc.io:443", "alert_if_down": False},
+            {"url": "https://story-testnet-rpc.contributiondao.com:443", "alert_if_down": False},
+            {"url": "https://story-testnet.rpc.kjnodes.com:443", "alert_if_down": False}
+        ]
+
     for entry in new_entries:
         chain_name = entry['moniker']
         address = entry['rpc']
+
+        random.shuffle(nodes)
 
         config["chains"][chain_name] = {
             "chain_id": "odyssey-0",
             "valoper_address": address,
             "public_fallback": True,
-            "nodes": [
-                {"url": "https://story-testnet-rpc.itrocket.net:443", "alert_if_down": False},
-                {"url": "https://odyssey.storyrpc.io:443", "alert_if_down": False},
-                {"url": "https://story-testnet-rpc.contributiondao.com:443", "alert_if_down": False},
-                {"url": "https://story-testnet.rpc.kjnodes.com:443", "alert_if_down": False}
-            ]
+            "nodes": nodes
         }
     save_config_with_sudo(config)
